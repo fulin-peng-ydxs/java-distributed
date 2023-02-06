@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>tradition-lock</module>
+        <module>redis-lock</module>
     </modules>
 
     <dependencies>

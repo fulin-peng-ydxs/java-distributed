@@ -1,4 +1,4 @@
-package tradition.lock;
+package redis.lock;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
