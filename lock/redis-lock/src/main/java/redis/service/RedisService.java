@@ -1,7 +1,8 @@
 package redis.service;
 
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
+import org.redisson.RedissonMultiLock;
+import org.redisson.RedissonRedLock;
+import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
@@ -213,6 +214,79 @@ public class RedisService {
         }
         // 解锁
         lock.unlock();
+    }
+
+   //redisson公平锁
+    public void redissonFairLock(){
+        RLock fairLock = redissonClient.getFairLock("anyLock");
+    }
+
+
+    //redisson联锁
+    public void redissonUnionLock(){
+        RLock lock1 = redissonClient.getLock("lock1");
+        RLock lock2 = redissonClient.getLock("lock2");
+        RLock lock3 = redissonClient.getLock("lock3");
+        // 同时加锁：lock1 lock2 lock3
+        // 所有的锁都上锁成功才算成功。
+        RedissonMultiLock lock = new RedissonMultiLock(lock1, lock2, lock3);
+
+        lock.lock();
+
+        lock.unlock();
+
+    }
+
+    //redisson红锁
+    public void redissonRedLock(){
+        RLock lock1 = redissonClient.getLock("lock1");
+        RLock lock2 = redissonClient.getLock("lock2");
+        RLock lock3 = redissonClient.getLock("lock3");
+        // 同时加锁：lock1 lock2 lock3
+        // 红锁在大部分节点上加锁成功就算成功。
+        RedissonRedLock lock = new RedissonRedLock(lock1, lock2, lock3);
+        lock.lock();
+        lock.unlock();
+    }
+
+    //redisson读写锁
+    public void redissonReadWriteLock() throws  Exception{
+        RReadWriteLock rwlock = redissonClient.getReadWriteLock("anyRWLock");
+        // 最常见的使用方法
+        rwlock.readLock().lock();
+        // 或
+            rwlock.writeLock().lock();
+
+        // 10秒钟以后自动解锁
+        // 无需调用unlock方法手动解锁
+        rwlock.readLock().lock(10, TimeUnit.SECONDS);
+        // 或
+        rwlock.writeLock().lock(10, TimeUnit.SECONDS);
+
+        // 尝试加锁，最多等待100秒，上锁以后10秒自动解锁
+        boolean res = rwlock.readLock().tryLock(100, 10, TimeUnit.SECONDS);
+        // 或
+        res = rwlock.writeLock().tryLock(100, 10, TimeUnit.SECONDS);
+    }
+
+    //redisson信号量
+    public void redissonRSemaphore() throws Exception {
+        RSemaphore semaphore = redissonClient.getSemaphore("semaphore");
+        semaphore.trySetPermits(3); //初始化：信号量
+        semaphore.acquire(); //获取信号量 -1
+        // do something
+        semaphore.release(); //释放信号量 +1
+    }
+
+
+    //redisson闭锁
+    public void redissonRCountDownLatch() throws  Exception{
+        RCountDownLatch latch = redissonClient.getCountDownLatch("anyCountDownLatch");
+        latch.trySetCount(1); //初始化闭锁值
+        //减1
+        latch.countDown();
+
+        latch.await(); //阻塞：等待值为0后释放
     }
 
 }
