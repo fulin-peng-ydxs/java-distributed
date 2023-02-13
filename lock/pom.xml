@@ -14,6 +14,8 @@
     <modules>
         <module>tradition-lock</module>
         <module>redis-lock</module>
+        <module>zk-lock</module>
+        <module>mysql-lock</module>
     </modules>
 
     <dependencies>
@@ -32,6 +34,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.7</version>
         </dependency>
 
     </dependencies>
