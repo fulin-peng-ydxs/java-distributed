@@ -89,4 +89,23 @@ public class SnowflakeIdGenerator {
         return System.currentTimeMillis();
     }
 
+
+    /**
+     * 单例对象控制器
+     * 2023/12/1 0001 11:21
+     * @author fulin-peng
+     */
+    private static class Holder {
+        // 单例的初始化，使用时请根据实际情况替换datacenterId和machineId的值
+        private static final SnowflakeIdGenerator INSTANCE = new SnowflakeIdGenerator(1, 1);
+    }
+
+    /**
+     * 单例对象获取
+     * 2023/12/1 0001 11:22
+     * @author fulin-peng
+     */
+    public static SnowflakeIdGenerator getInstance() {
+        return Holder.INSTANCE;
+    }
 }
