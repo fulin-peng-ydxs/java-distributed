@@ -17,6 +17,7 @@
 
   <modules>
     <module>lock</module>
+    <module>id</module>
   </modules>
 
   <dependencies>
