@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 @Component
-public class ZkClient {
+public class ZkClientConfig {
     private static final String connectString = "172.16.116.100:2181";
     private static final String ROOT_PATH = "/distributed";
     private ZooKeeper zooKeeper;

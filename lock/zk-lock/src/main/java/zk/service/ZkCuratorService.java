@@ -1,84 +1,29 @@
 package zk.service;
 
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.*;
 import org.apache.curator.framework.recipes.shared.SharedCount;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import tradition.dao.StockMapper;
 import tradition.entity.Stock;
-import zk.config.ZkClient;
-import zk.lock.ZkDistributedLock;
-import zk.lock.ZkDistributedLockForWait;
-import zk.lock.ZkDistributedLockReentrant;
-
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author PengFuLin
- * 2023/2/12 21:48
+ * ZKCurator 服务
+ * @author pengshuaifeng
+ * 2024/3/23
  */
-public class ZKService {
-
-    @Autowired
-    private ZkClient client;
-
-    @Autowired
-    private StockMapper stockMapper;
+@Service
+public class ZkCuratorService {
 
     @Autowired
     private CuratorFramework curatorFramework;
 
-
-    //简单实现
-    public void checkAndLock() {
-        // 加锁，获取锁失败重试
-        ZkDistributedLock lock = this.client.getZkDistributedLock("lock");
-        lock.lock();
-        // 先查询库存是否充足
-        Stock stock = this.stockMapper.selectById(1L);
-        // 再减库存
-        if (stock != null && stock.getCount() > 0){
-            stock.setCount(stock.getCount() - 1);
-            this.stockMapper.updateById(stock);
-        }
-        // 释放锁
-        lock.unlock();
-    }
-
-    //阻塞排队实现
-    public void checkAndLockForWait() {
-        // 加锁，获取锁失败重试
-        ZkDistributedLockForWait lock = this.client.getZkDistributedLockForWait("lock");
-        lock.lock();
-        // 先查询库存是否充足
-        Stock stock = this.stockMapper.selectById(1L);
-        // 再减库存
-        if (stock != null && stock.getCount() > 0){
-            stock.setCount(stock.getCount() - 1);
-            this.stockMapper.updateById(stock);
-        }
-        // 释放锁
-        lock.unlock();
-    }
-
-    //可重入
-    public void checkAndLockForkReentrant() {
-        // 加锁，获取锁失败重试
-        ZkDistributedLockReentrant lock = this.client.getZkDistributedLockReentrant("lock");
-        lock.lock();
-        // 先查询库存是否充足
-        Stock stock = this.stockMapper.selectById(1L);
-        // 再减库存
-        if (stock != null && stock.getCount() > 0){
-            stock.setCount(stock.getCount() - 1);
-            this.stockMapper.updateById(stock);
-        }
-        // 释放锁
-        lock.unlock();
-    }
-
-    //Curator客户端
+    @Autowired
+    private StockMapper stockMapper;
 
     //可重入:基本原理也是序列化节点+监听事件的排队获取锁
     public void checkAndLockCurator() {
@@ -93,7 +38,7 @@ public class ZKService {
                 stock.setCount(stock.getCount() - 1);
                 this.stockMapper.updateById(stock);
             }
-             this.testSub(mutex);
+            this.testSub(mutex);
             mutex.release(); // 释放锁
         } catch (Exception e) {
             e.printStackTrace();
@@ -190,7 +135,5 @@ public class ZKService {
             e.printStackTrace();
         }
     }
-
-
 
 }
