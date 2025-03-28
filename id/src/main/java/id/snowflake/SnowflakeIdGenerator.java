@@ -26,6 +26,8 @@ public class SnowflakeIdGenerator {
     /**
      * 构造函数：传入数据中心和机器标识
      * 2023/12/1 0001 10:51
+     * @param datacenterId 数据中心
+     * @param machineId 机器标识
      * @author fulin-peng
      */
     public SnowflakeIdGenerator(long datacenterId, long machineId) {
